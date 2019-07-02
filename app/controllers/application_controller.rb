@@ -1,13 +1,20 @@
 class ApplicationController < ActionController::API
     include Response
     include ExceptionHandler
+    before_action :authorize_request
+    attr_reader :current_user
     after_action :cors_set_access_control_headers
+    cache_classes=true
 
     def route_options
         cors_preflight_check
     end
 
     private 
+
+    def authorize_request
+        @current_user = (AuthorizeApiRequest.new(request.headers).call)[:user]
+    end    
 
     def cors_set_access_control_headers
         response.headers['Access-Control-Allow-Origin'] = '*'

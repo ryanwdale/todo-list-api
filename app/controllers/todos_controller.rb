@@ -7,7 +7,7 @@ class TodosController < ApplicationController
     end
     
     def create
-        @todo = current_user.todos.create!(todo_params)
+        @todo = Todo.create!(todo_params)
         json_response(@todo, :created)
     end
     
@@ -23,15 +23,17 @@ class TodosController < ApplicationController
     def destroy
         @todo.destroy
         json_response(:destroyed)
-    end
+    end 
     
     private
 
     def todo_params
-        params.permit(:text, :complete, :todo)
+        params.require(:todo).permit(:text, :complete, :user_id, :id, :created_at, :updated_at)
+        .with_defaults(user_id: current_user.id)
     end
     
     def set_todo
         @todo = Todo.find(params[:id])
     end
+
 end
